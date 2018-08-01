@@ -25,7 +25,9 @@ tf.app.flags.DEFINE_bool('restore', True, "whether to restore graph from checkpo
 tf.app.flags.DEFINE_string('checkpoint_dir', "./ckpt", "path to save checkpoint")
 tf.app.flags.DEFINE_integer('save_step_interval', 8000, 'save checkpoint step interval')
 tf.app.flags.DEFINE_integer('validation_interval_steps', 4000, 'the steps interval to validation')
-tf.app.flags.DEFINE_integer('num_epochs', 10000, 'num of epochs to train')
-tf.app.flags.DEFINE_integer('augment_factor', 9, 'num of epochs to train')
+tf.app.flags.DEFINE_integer('num_epochs', 150, 'num of epochs to train')
+tf.app.flags.DEFINE_integer('augment_factor', 20, 'num of epochs to train')
+tf.app.flags.DEFINE_bool('step_set0', True, "whether to restore graph from checkpoint")
+
 
 FLAGS = tf.app.flags.FLAGS

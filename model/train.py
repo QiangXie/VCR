@@ -50,9 +50,12 @@ class Trainer(object):
             all_variables_list = tf.global_variables()
             #train step from 0 
             restore_variables_list = []
-            for item in all_variables_list:
-                if item.name != "global_step:0":
-                    restore_variables_list.append(item)
+            if FLAGS.step_set0:
+                for item in all_variables_list:
+                    if item.name != "global_step:0":
+                        restore_variables_list.append(item)
+            else:
+                restore_variables_list = all_variables_list
             self.saver = tf.train.Saver(restore_variables_list, max_to_keep=100)
             self.tb_writer = tf.summary.FileWriter(FLAGS.log_dir + '/train', self.sess.graph)
             if FLAGS.restore:
@@ -84,7 +87,7 @@ class Trainer(object):
                                 self.train_batch_encode_labels],
                                 feed_dict=feed)
                     
-                    if (cur_batch + 1) % 5 == 0:
+                    if (cur_batch + 1) % 20 == 0:
                         self.timer.toc()
                         print("Batch {} time consuming: {:.5f}s, last_batch_err = {:.5f}, lr = {:.5f}".
                                 format(cur_batch, self.timer.total_time, cost_averge, lr))

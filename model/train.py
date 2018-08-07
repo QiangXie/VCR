@@ -53,6 +53,9 @@ class Trainer(object):
             if data_type == 2:
                 self.train_feeder = DataIterator.DataIterator2(self.train_data_dir,
                         image_width, image_height, image_channel, self.batch_size, augment_factor)
+            elif data_type ==  3:
+                self.train_feeder = DataIterator.DataIterator3(self.train_data_dir,
+                        image_width, image_height, image_channel, self.batch_size)
             self.train_batch_inputs, self.train_batch_sparse_labels, self.train_batch_encode_labels =\
                     self.train_feeder.feed_tensor()
             print("Load train data done, load {} images.".format(self.train_feeder.size))
@@ -60,6 +63,10 @@ class Trainer(object):
             if data_type == 2:
                 self.val_feeder = DataIterator.DataIterator2(self.val_data_dir, 
                         image_width, image_height, image_channel, self.batch_size, augment_factor)
+            elif data_type == 3:
+                self.val_feeder = DataIterator.DataIterator3(self.val_data_dir, 
+                        image_width, image_height, image_channel, self.batch_size)
+                
             self.val_batch_inputs, self.val_batch_sparse_labels, self.val_batch_encode_labels =\
                     self.val_feeder.feed_tensor()
             print("Load val data done, load {} images.".format(self.val_feeder.size))

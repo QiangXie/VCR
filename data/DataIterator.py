@@ -132,10 +132,10 @@ class DataIterator3(object):
         self.img_pathes = [os.path.join(data_dir, img) for img in imgs]
         str_labels = [os.path.splitext(img)[0].split("_")[1] for img in imgs]
         self.encode_labels = list()
-        for i,str_label in enumerate(str_labels):
+        for i,str_label in enumerate(tqdm(str_labels, ascii=True, desc="Read data")):
             encode_label = [SPACE_INDEX if str_label == SPACE_TOKEN else encode_maps[c] for c in list(str_label)]
-            print("Process {},\nstring label: {}, \nencode label: {}".format(
-                self.img_pathes[i], str_label,  encode_label))
+            #print("Process {},\nstring label: {}, \nencode label: {}".format(
+            #    self.img_pathes[i], str_label,  encode_label))
             self.encode_labels.append(encode_label)
 
         image_pathes_tensor = tf.convert_to_tensor(self.img_pathes, dtype=tf.string)

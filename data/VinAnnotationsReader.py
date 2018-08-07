@@ -2,11 +2,9 @@ import os
 import cv2
 import xml.etree.ElementTree as ET
 import shutil
-import config
 from data.data_augmentation import DataAugmentation
 from tqdm import tqdm
 
-FLAGS = config.FLAGS
 
 charset = u'0123456789ABCDEFGHJKLMNPRSTUVWXYZ'
 class VinAnnotation(object):

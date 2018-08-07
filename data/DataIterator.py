@@ -2,11 +2,9 @@ from data import VinAnnotationsReader
 import tensorflow as tf
 import numpy as np
 import sys
-import config
 import os
 from tqdm import tqdm
 
-FLAGS = config.FLAGS
 
 charset = u'0123456789ABCDEFGHJKLMNPRSTUVWXYZ'
 #charset = u'0123456789+-*()'
@@ -23,7 +21,7 @@ encode_maps[SPACE_TOKEN] = SPACE_INDEX
 decode_maps[SPACE_INDEX] = SPACE_TOKEN
 
 class DataIterator(object):
-    def __init__(self, data_dir):
+    def __init__(self, data_dir, image_width, image_height, image_channel, batch_size):
         vin_annotations_reader = VinAnnotationsReader.VinAnnotationsReader(data_dir)
         self.img_pathes = vin_annotations_reader.get_img_list()
         self.crop_windows = list()
@@ -51,14 +49,14 @@ class DataIterator(object):
                         [image_pathes_tensor, encode_labels_tensor, crop_window_tensor],
                         shuffle=True)
         image = tf.read_file(image_pathes_queue)
-        image = tf.image.decode_and_crop_jpeg(image, crop_window_queue, channels=FLAGS.image_channel)
-        image = tf.image.resize_images(image, [FLAGS.image_height, FLAGS.image_width])
+        image = tf.image.decode_and_crop_jpeg(image, crop_window_queue, channels=image_channel)
+        image = tf.image.resize_images(image, [image_height, image_width])
         image = image*1.0/127.5 - 1.0
 
         self.batch_inputs, self.batch_encode_labels = \
                 tf.train.batch([image, encode_labels_queue],
-                        batch_size = FLAGS.batch_size,
-                        capacity = FLAGS.batch_size*8,
+                        batch_size = batch_size,
+                        capacity = batch_size*8,
                         num_threads = 4)
 
         indx = tf.where(tf.not_equal(self.batch_encode_labels, 0))
@@ -78,12 +76,12 @@ class DataIterator(object):
 
 
 class DataIterator2(object):
-    def __init__(self, data_dir):
+    def __init__(self, data_dir, image_width, image_height, image_channel, batch_size, augment_factor):
         vin_annotations_reader = VinAnnotationsReader.VinAnnotationsReader(data_dir)
         vin_annotations_reader.crop(os.path.join(data_dir, "crop"))
         vin_annotations_reader.data_augmentation(os.path.join(data_dir, "crop"), 
                 os.path.join(data_dir, "augment"),
-                multiple=FLAGS.augment_factor)
+                multiple=augment_factor)
         imgs = os.listdir(os.path.join(data_dir, "augment"))
         self.img_pathes = [os.path.join(os.path.join(data_dir, "augment", img)) for img in imgs]
         str_labels = [os.path.splitext(img)[0].split("_")[1] for img in imgs]
@@ -103,14 +101,14 @@ class DataIterator2(object):
                         [image_pathes_tensor, encode_labels_tensor],
                         shuffle=True)
         image = tf.read_file(image_pathes_queue)
-        image = tf.image.decode_jpeg(image, channels=FLAGS.image_channel)
-        image = tf.image.resize_images(image, [FLAGS.image_height, FLAGS.image_width])
+        image = tf.image.decode_jpeg(image, channels=image_channel)
+        image = tf.image.resize_images(image, [image_height, image_width])
         image = image*1.0/127.5 - 1.0
 
         self.batch_inputs, self.batch_encode_labels = \
                 tf.train.batch([image, encode_labels_queue],
-                        batch_size = FLAGS.batch_size,
-                        capacity = FLAGS.batch_size*8,
+                        batch_size = batch_size,
+                        capacity = batch_size*8,
                         num_threads = 4)
 
         indx = tf.where(tf.not_equal(self.batch_encode_labels, 0))
@@ -129,7 +127,7 @@ class DataIterator2(object):
         return self.batch_inputs, self.batch_sparse_labels, self.batch_encode_labels
 
 class DataIterator3(object):
-    def __init__(self, data_dir):
+    def __init__(self, data_dir, image_width, image_height, image_channel, batch_size):
         imgs = os.listdir(data_dir)
         self.img_pathes = [os.path.join(data_dir, img) for img in imgs]
         str_labels = [os.path.splitext(img)[0].split("_")[1] for img in imgs]
@@ -148,14 +146,14 @@ class DataIterator3(object):
                         [image_pathes_tensor, encode_labels_tensor],
                         shuffle=True)
         image = tf.read_file(image_pathes_queue)
-        image = tf.image.decode_jpeg(image, channels=FLAGS.image_channel)
-        image = tf.image.resize_images(image, [FLAGS.image_height, FLAGS.image_width])
+        image = tf.image.decode_jpeg(image, channels=image_channel)
+        image = tf.image.resize_images(image, [image_height, image_width])
         image = image*1.0/127.5 - 1.0
 
         self.batch_inputs, self.batch_encode_labels = \
                 tf.train.batch([image, encode_labels_queue],
-                        batch_size = FLAGS.batch_size,
-                        capacity = FLAGS.batch_size*8,
+                        batch_size = batch_size,
+                        capacity = batch_size*8,
                         num_threads = 4)
 
         indx = tf.where(tf.not_equal(self.batch_encode_labels, 0))
@@ -175,7 +173,7 @@ class DataIterator3(object):
 
 
 class DataIterator4(object):
-    def __init__(self, data_dir):
+    def __init__(self, data_dir, image_width, image_height, image_channel, batch_size):
         label_file = open(os.path.join(data_dir, "labels.txt"))
         lines = label_file.readlines()
         self.img_pathes = list()
@@ -201,14 +199,14 @@ class DataIterator4(object):
                         [image_pathes_tensor, encode_labels_tensor],
                         shuffle=True)
         image = tf.read_file(image_pathes_queue)
-        image = tf.image.decode_jpeg(image, channels=FLAGS.image_channel)
-        image = tf.image.resize_images(image, [FLAGS.image_height, FLAGS.image_width])
+        image = tf.image.decode_jpeg(image, channels=image_channel)
+        image = tf.image.resize_images(image, [image_height, image_width])
         image = image*1.0/127.5 - 1.0
 
         self.batch_inputs, self.batch_encode_labels = \
                 tf.train.batch([image, encode_labels_queue],
-                        batch_size = FLAGS.batch_size,
-                        capacity = FLAGS.batch_size*8,
+                        batch_size = batch_size,
+                        capacity = batch_size*8,
                         num_threads = 4)
 
         indx = tf.where(tf.not_equal(self.batch_encode_labels, 0))

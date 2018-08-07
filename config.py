@@ -8,7 +8,7 @@ tf.app.flags.DEFINE_integer('char_classes', 35, 'char classes')
 tf.app.flags.DEFINE_integer('batch_size', 32, 'batch size')
 tf.app.flags.DEFINE_integer('num_hidden', 128, 'lstm num hidden')
 
-tf.app.flags.DEFINE_float('initial_learning_rate', 1e-3, 'inital lr')
+tf.app.flags.DEFINE_float('initial_learning_rate', 1e-4, 'inital lr')
 tf.app.flags.DEFINE_float('decay_rate', 0.1, 'the lr decay rate')
 tf.app.flags.DEFINE_float('beta1', 0.9, 'parameter of adam optimizer beta1')
 tf.app.flags.DEFINE_float('beta2', 0.999, 'adam parameter beta2')

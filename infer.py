@@ -12,7 +12,8 @@ infer.build_model()
 counter = 0
 right_counter = 0
 pathes = []
-for test_img in tqdm(test_imgs, desc="Test"):
+for test_img in test_imgs:
+    counter += 1
     img_abs_path = os.path.join(test_data_path, test_img)
     results = infer.recognize_from_path(img_abs_path)
     result = results[0] 
@@ -20,4 +21,7 @@ for test_img in tqdm(test_imgs, desc="Test"):
     if gt == result:
         right_counter += 1
     #print("GT:{},Result:{}".format(gt, result))
+    else:
+        print("GT:{},Result:{}".format(gt, result))
+
 print("Accuracy: {:.3f}".format(float(right_counter)/float(counter)*100))

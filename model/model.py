@@ -16,6 +16,7 @@ class LSTMOCR(object):
         self.num_hidden = num_hidden
         self.output_keep_prob = output_keep_prob
         self.num_classes = num_classes
+        self.model = mode
         if self.mode == "train":
             self.inputs = inputs
             self.labels = sparse_labels
@@ -27,9 +28,9 @@ class LSTMOCR(object):
             self.seq_len = tf.placeholder(tf.int32, [None])
         self._extra_train_ops = list()
 
-    def build_graph(self, train_num_batches_per_epoch, 
-            initial_learning_rate, decay_epoch, decay_rate,
-            beta1, beta2, batch_size):
+    def build_graph(self, train_num_batches_per_epoch=None, 
+            initial_learning_rate=None, decay_epoch=None, decay_rate=None,
+            beta1=None, beta2=None, batch_size=None):
         self._build_model(batch_size)
         self._build_train_op(train_num_batches_per_epoch, initial_learning_rate, 
                 decay_epoch, decay_rate,
@@ -122,22 +123,23 @@ class LSTMOCR(object):
 
     def _build_train_op(self, train_num_batches_per_epoch, initial_learning_rate, decay_epoch, decay_rate,
             beta1, beta2):
-        # self.global_step = tf.Variable(0, trainable=False)
-        #self.global_step = tf.train.get_or_create_global_step()
-        self.global_step = tf.train.create_global_step()
+        if self.model == "train":
+            # self.global_step = tf.Variable(0, trainable=False)
+            #self.global_step = tf.train.get_or_create_global_step()
+            self.global_step = tf.train.create_global_step()
 
-        self.loss = tf.nn.ctc_loss(labels=self.labels,
-                                   inputs=self.logits,
-                                   sequence_length=self.seq_len)
-        self.cost = tf.reduce_mean(self.loss)
-        tf.summary.scalar('cost', self.cost)
+            self.loss = tf.nn.ctc_loss(labels=self.labels,
+                                       inputs=self.logits,
+                                       sequence_length=self.seq_len)
+            self.cost = tf.reduce_mean(self.loss)
+            tf.summary.scalar('cost', self.cost)
 
-        self.lrn_rate = tf.train.exponential_decay(initial_learning_rate,
-                                                   self.global_step,
-                                                   decay_epoch*train_num_batches_per_epoch,
-                                                   decay_rate,
-                                                   staircase=True)
-        tf.summary.scalar('learning_rate', self.lrn_rate)
+            self.lrn_rate = tf.train.exponential_decay(initial_learning_rate,
+                                                       self.global_step,
+                                                       decay_epoch*train_num_batches_per_epoch,
+                                                       decay_rate,
+                                                       staircase=True)
+            tf.summary.scalar('learning_rate', self.lrn_rate)
 
         # self.optimizer = tf.train.RMSPropOptimizer(learning_rate=self.lrn_rate,
         #                                            momentum=FLAGS.momentum).minimize(self.cost,
@@ -146,12 +148,12 @@ class LSTMOCR(object):
         #                                             momentum=FLAGS.momentum,
         #                                             use_nesterov=True).minimize(self.cost,
         #                                                                         global_step=self.global_step)
-        self.optimizer = tf.train.AdamOptimizer(learning_rate=self.lrn_rate,
-                                                beta1=beta1,
-                                                beta2=beta2).minimize(self.loss,
-                                                                            global_step=self.global_step)
-        train_ops = [self.optimizer] + self._extra_train_ops
-        self.train_op = tf.group(*train_ops)
+            self.optimizer = tf.train.AdamOptimizer(learning_rate=self.lrn_rate,
+                                                    beta1=beta1,
+                                                    beta2=beta2).minimize(self.loss,
+                                                                                global_step=self.global_step)
+            train_ops = [self.optimizer] + self._extra_train_ops
+            self.train_op = tf.group(*train_ops)
 
         # Option 2: tf.nn.ctc_beam_search_decoder
         # (it's slower but you'll get better results)

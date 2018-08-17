@@ -23,7 +23,7 @@ if __name__ == "__main__":
             output_keep_prob=FLAGS.output_keep_prob,
             num_classes=FLAGS.char_classes,
             initial_learning_rate=1e-3,
-            decay_epoch=20,
+            decay_epoch=30,
             decay_rate=FLAGS.decay_rate,
             beta1=FLAGS.beta1,
             beta2=FLAGS.beta2,

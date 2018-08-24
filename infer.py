@@ -2,7 +2,7 @@ import os
 from model.infer import Infer
 from tqdm import tqdm
 
-test_data_path = "/home/new/Data/vin_data_checked/val/augment"
+test_data_path = "/home/new/Data/vin_data_checked/mix"
 
 test_imgs = os.listdir(test_data_path)
 
@@ -20,8 +20,6 @@ for test_img in test_imgs:
     gt = os.path.splitext(test_img)[0].split('_')[1]
     if gt == result:
         right_counter += 1
-    #print("GT:{},Result:{}".format(gt, result))
-    else:
-        print("GT:{},Result:{}".format(gt, result))
-
-print("Accuracy: {:.3f}".format(float(right_counter)/float(counter)*100))
+    print("GT:{},Result:{}".format(gt, result))
+    print("Counter:{},Right_counter:{},Accuracy: {:.3f}%".format(counter,
+        right_counter, float(right_counter)/float(counter)*100))

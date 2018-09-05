@@ -98,7 +98,8 @@ class Trainer(object):
                     beta2,
                     batch_size)
         with tf.device("/cpu:0"):
-            config = tf.ConfigProto(allow_soft_placement=True)
+            gpu_options = tf.GPUOptions(allow_growth=True)
+            config = tf.ConfigProto(allow_soft_placement=True, gpu_options=gpu_options)
             self.sess = tf.Session(config=config)
             self.sess.run(tf.global_variables_initializer())
             self.sess.run(tf.local_variables_initializer())

@@ -3,7 +3,7 @@ from model.infer import Infer
 import argparse
 
 parser = argparse.ArgumentParser(description='Process argument')
-parser.add_argument("--test_data_path", dest="test_data_path", type=str, default="./1")
+parser.add_argument("--test_data_path", dest="test_data_path", type=str, default="./2")
 args = parser.parse_args()
 
 test_imgs = os.listdir(args.test_data_path)

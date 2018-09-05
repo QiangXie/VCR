@@ -4,6 +4,7 @@ import xml.etree.ElementTree as ET
 import shutil
 from data.data_augmentation import DataAugmentation
 from tqdm import tqdm
+import numpy as np
 
 
 charset = u'0123456789ABCDEFGHJKLMNPRSTUVWXYZ'
@@ -45,6 +46,9 @@ class VinAnnotationsReader(object):
                     tree = ET.parse(xml_abs_path)
                     root = tree.getroot()
                     annotation = root.find('object')
+                    if not isinstance(annotation, ET.Element):
+                        print("Error in {}".format(xml_abs_path))
+                        continue
                     vin_code_ = annotation.find('name').text
                     #check vin code and fix it, vin code does not contain IOQ
                     if len(vin_code_) != 17:
@@ -105,6 +109,31 @@ class VinAnnotationsReader(object):
             save_name = "{}_{}.jpg".format(i, vin_code)
             save_path = os.path.join(save_dir, save_name)
             cv2.imwrite(save_path, vin_img_cv)
+
+    def horizontal_random_crop(self, save_dir, multiple=3):
+        if not os.path.exists(save_dir):
+            raise ValueError("save_dir not exists.")
+        counter = self.img_num - 1
+        for i in tqdm(range(self.img_num), desc="Horizontal random crop:"):
+            img_cv = cv2.imread(self.img_list[i])
+            xmin, ymin, xmax, ymax = self.vin_annotations[i].get_boundingbox()
+            width = xmax - xmin
+            single_char_width = width / 17
+            vin_code = self.vin_annotations[i].get_vin_code()
+            for j in range(multiple):
+                counter += 1
+                left_random_extend = np.random.randint(0, int(single_char_width*1.5), 1)[0]
+                right_random_extend = np.random.randint(0, int(single_char_width*1.5), 1)[0]
+                xmax_new = min(img_cv.shape[1], xmax+right_random_extend)
+                xmin_new = max(0, xmin-left_random_extend)
+                vin_img_cv = img_cv[ymin:ymax, xmin_new:xmax_new]
+                save_name = "{}_{}.jpg".format(counter, vin_code)
+                save_path = os.path.join(save_dir, save_name)
+                cv2.imwrite(save_path, vin_img_cv)
+
+
+
+
 
     def data_augmentation(self, data_dir, save_dir, multiple=10):
         if not os.path.exists(save_dir):

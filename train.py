@@ -9,6 +9,7 @@ FLAGS = config.FLAGS
 def data_augmentation(data_dir):
     vin_annotations_reader = VinAnnotationsReader.VinAnnotationsReader(data_dir)
     vin_annotations_reader.crop(os.path.join(data_dir, "crop"))
+    vin_annotations_reader.horizontal_random_crop(os.path.join(data_dir, "crop"))
     vin_annotations_reader.data_augmentation(os.path.join(data_dir, "crop"),
             os.path.join(data_dir, "augment"),
             multiple=20)
@@ -35,7 +36,7 @@ if __name__ == "__main__":
             checkpoint_dir=FLAGS.checkpoint_dir,
             train_epochs=FLAGS.num_epochs,
             save_step_interval=10000,
-            validation_interval_steps=FLAGS.validation_interval_steps,
+            validation_interval_steps=5059*30,
             image_height=FLAGS.image_height,
             image_width=FLAGS.image_width,
             image_channel=FLAGS.image_channel,

@@ -4,6 +4,7 @@ import numpy as np
 import sys
 import os
 from tqdm import tqdm
+import cv2
 
 
 charset = u'0123456789ABCDEFGHJKLMNPRSTUVWXYZ'
@@ -146,8 +147,8 @@ class DataIterator3(object):
                         [image_pathes_tensor, encode_labels_tensor],
                         shuffle=True)
         image = tf.read_file(image_pathes_queue)
-        image = tf.image.decode_jpeg(image, channels=image_channel)
-        image = tf.image.resize_images(image, [image_height, image_width])
+        image = tf.image.decode_jpeg(image, channels=image_channel, dct_method="INTEGER_ACCURATE")
+        image = tf.image.resize_images(image, [image_height, image_width], method=tf.image.ResizeMethod.BILINEAR)
         image = image*1.0/127.5 - 1.0
 
         self.batch_inputs, self.batch_encode_labels = \
@@ -223,3 +224,4 @@ class DataIterator4(object):
 
     def feed_tensor(self):
         return self.batch_inputs, self.batch_sparse_labels, self.batch_encode_labels
+
